@@ -2,7 +2,8 @@ package terminal;
 
 
 import java.awt.FlowLayout;
-import java.awt.Dialog.ModalityType;
+//import java.awt.Dialog.ModalityType;
+
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -19,6 +20,7 @@ import java.awt.event.ActionEvent;
 
 public class PortSetupDetails extends JDialog implements ActionListener {
 
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private TerminalSettings ts;
 

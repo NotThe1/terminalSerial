@@ -40,7 +40,6 @@ import jssc.SerialPortException;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
 import java.awt.SystemColor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -67,7 +66,8 @@ public class Terminal implements ActionListener {
 		keyBoardBuffer = new LinkedList<Byte>();
 		screen.setText("");
 		updateScreenPositionData();
-		patternForPrintableChars = Pattern.compile(allPrintableCharactersPattern);
+		patternForPrintableChars = Pattern
+				.compile(allPrintableCharactersPattern);
 	}// initApplicaion
 
 	/*
@@ -76,11 +76,13 @@ public class Terminal implements ActionListener {
 
 	private void keyReceived(Byte value) {
 		// supressCaretUpdate = true;
-		lblLastByteSent.setText(String.format("Last Byte sent : %02X - %s", value, value.toString()));
+		lblLastByteSent.setText(String.format("Last Byte sent : %02X - %s",
+				value, value.toString()));
 		int cp = screen.getCaretPosition(); // where are we
 
 		String ck = new String(new byte[] { value });
-		lblLastByteSent.setText(String.format("Last Byte sent : %02X - %s", value, ck));
+		lblLastByteSent.setText(String.format("Last Byte sent : %02X - %s",
+				value, ck));
 
 		matcher = patternForPrintableChars.matcher(ck); // looking for printable
 														// characters
@@ -97,7 +99,8 @@ public class Terminal implements ActionListener {
 				java.awt.Toolkit.getDefaultToolkit().beep();
 				break;
 			case 0X08: // Backspace \b
-				screen.setCaretPosition(Math.max(screen.getCaretPosition() - 1, 0));
+				screen.setCaretPosition(Math.max(screen.getCaretPosition() - 1,
+						0));
 				break;
 			case 0X09: // Tab \t
 				for (int i = screen.getCaretPosition() % tabWidth; i < tabWidth; i++) {
@@ -115,7 +118,8 @@ public class Terminal implements ActionListener {
 				screen.setText("");
 				break;
 			case 0X0D: // Carriage return \r
-				screen.setCaretPosition(screen.getCaretPosition() - (screen.getCaretPosition() % MAX_COLUMNS));
+				screen.setCaretPosition(screen.getCaretPosition()
+						- (screen.getCaretPosition() % MAX_COLUMNS));
 				break;
 			case 0X1B: // Escape \e
 				break;
@@ -131,7 +135,8 @@ public class Terminal implements ActionListener {
 
 		screen.replaceRange(null, 0, MAX_COLUMNS);
 		String screenTemp = screen.getText();
-		screen.setText(screenTemp.substring(0, ((MAX_ROWS - 1) * MAX_COLUMNS) - 1));
+		screen.setText(screenTemp.substring(0,
+				((MAX_ROWS - 1) * MAX_COLUMNS) - 1));
 		screen.setEnabled(true);
 	}// scrollLine
 
@@ -144,7 +149,8 @@ public class Terminal implements ActionListener {
 	}// updateRowCol
 
 	private void updateScreenPositionData() {
-		String spd = String.format("Row: %02d  Column: %02d  Cursor %04d", row, col, lastCaretPosition);
+		String spd = String.format("Row: %02d  Column: %02d  Cursor %04d", row,
+				col, lastCaretPosition);
 		lblScreenPositionInfo.setText(spd);
 	}// updateScreenPositionData
 
@@ -162,17 +168,23 @@ public class Terminal implements ActionListener {
 
 	private void sendOutputBuffer() {
 		if (serialPort == null) {
-			String msg = String.format("Serial Port %s is not opened", terminalSettings.getPortName());
-			JOptionPane.showMessageDialog(null,"Keyboard In", msg,JOptionPane.WARNING_MESSAGE);
+			String msg = String.format("Serial Port %s is not opened",
+					terminalSettings.getPortName());
+			JOptionPane.showMessageDialog(null, "Keyboard In", msg,
+					JOptionPane.WARNING_MESSAGE);
 		} else {
 			Byte outByte = keyBoardBuffer.poll();
 			while (outByte != null) {
 				try {
 					serialPort.writeByte(outByte);
 				} catch (SerialPortException e) {
-					String msg = String.format("Failed to write byte %02d to port %s with exception %s",outByte, terminalSettings.getPortName(),e.getExceptionType());
-					JOptionPane.showMessageDialog(null,msg,"Keyboard In", JOptionPane.WARNING_MESSAGE);
-//					e.printStackTrace();
+					String msg = String
+							.format("Failed to write byte %02d to port %s with exception %s",
+									outByte, terminalSettings.getPortName(),
+									e.getExceptionType());
+					JOptionPane.showMessageDialog(null, msg, "Keyboard In",
+							JOptionPane.WARNING_MESSAGE);
+					// e.printStackTrace();
 				}
 				// sendByte(outByte);
 				outByte = keyBoardBuffer.poll();
@@ -183,7 +195,7 @@ public class Terminal implements ActionListener {
 
 	private void processKeyTyped(Character keyIn) {
 		Byte byteIn = (byte) keyIn.charValue();
-//		System.out.printf("keyIn = %s , %02X%n", keyIn, byteIn);
+		// System.out.printf("keyIn = %s , %02X%n", keyIn, byteIn);
 		if (!fullDuplex) {
 			keyReceived(byteIn);
 		}// if
@@ -197,7 +209,8 @@ public class Terminal implements ActionListener {
 		@Override
 		public void serialEvent(SerialPortEvent spe) {
 			if (spe.isRXCHAR()) {
-//				System.out.printf(" spe.getEventValue() = %d%n", spe.getEventValue());
+				// System.out.printf(" spe.getEventValue() = %d%n",
+				// spe.getEventValue());
 				if (spe.getEventValue() > 0) {// data available
 					try {
 						byte[] buffer = serialPort.readBytes();
@@ -213,10 +226,12 @@ public class Terminal implements ActionListener {
 				}// inner if
 
 			} else if (spe.isCTS()) { // CTS line has changed state
-				String msg = (spe.getEventValue() == 1) ? "CTS - On" : "CTS - Off";
+				String msg = (spe.getEventValue() == 1) ? "CTS - On"
+						: "CTS - Off";
 				System.out.println(msg);
 			} else if (spe.isDSR()) { // DSR line has changed state
-				String msg = (spe.getEventValue() == 1) ? "DSR - On" : "DSR - Off";
+				String msg = (spe.getEventValue() == 1) ? "DSR - On"
+						: "DSR - Off";
 				System.out.println(msg);
 			} else {
 				System.out.printf("Unhandled event : %s%n", spe.toString());
@@ -251,7 +266,8 @@ public class Terminal implements ActionListener {
 
 	private void openConnection() {
 		if (serialPort != null) {
-			String msg = String.format("Serial Port %s is already opened", terminalSettings.getPortName());
+			String msg = String.format("Serial Port %s is already opened",
+					terminalSettings.getPortName());
 			JOptionPane.showMessageDialog(null, msg);
 			showConnectionString();
 			return;
@@ -260,8 +276,10 @@ public class Terminal implements ActionListener {
 
 		try {
 			serialPort.openPort();// Open serial port
-			serialPort.setParams(terminalSettings.getBaudRate(), terminalSettings.getDataBits(),
-					terminalSettings.getStopBits(), terminalSettings.getParity());
+			serialPort.setParams(terminalSettings.getBaudRate(),
+					terminalSettings.getDataBits(),
+					terminalSettings.getStopBits(),
+					terminalSettings.getParity());
 			serialPort.addEventListener(new SerialPortReader());
 		} catch (SerialPortException ex) {
 			System.out.println(ex);
@@ -309,9 +327,12 @@ public class Terminal implements ActionListener {
 			strStopBits = "1.5";
 			break;
 		}// switch - stopBits
-		String[] strParity = new String[] { "None", "Odd", "Even", "Mark", "Space" };
-		String con = String.format("%s-%d-%d-%s-%s", terminalSettings.getPortName(), terminalSettings.getBaudRate(),
-				terminalSettings.getDataBits(), strStopBits, strParity[terminalSettings.getParity()]);
+		String[] strParity = new String[] { "None", "Odd", "Even", "Mark",
+				"Space" };
+		String con = String.format("%s-%d-%d-%s-%s",
+				terminalSettings.getPortName(), terminalSettings.getBaudRate(),
+				terminalSettings.getDataBits(), strStopBits,
+				strParity[terminalSettings.getParity()]);
 
 		lblCurrentSettings.setText(con);
 	}// showConnectionString
@@ -322,11 +343,14 @@ public class Terminal implements ActionListener {
 
 	private void loadSettings(String fileName) {
 
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName + FILE_SUFFIX_PERIOD))) {
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
+				fileName + FILE_SUFFIX_PERIOD))) {
 			terminalSettings = (TerminalSettings) ois.readObject();
 			currentSettingsFileName = fileName;
 		} catch (ClassNotFoundException | IOException cnfe) {
-			String msg = String.format("Could not find: %s, will proceed with default settings", fileName);
+			String msg = String.format(
+					"Could not find: %s, will proceed with default settings",
+					fileName);
 			JOptionPane.showMessageDialog(null, msg);
 			if (terminalSettings != null) {
 				terminalSettings = null;
@@ -344,10 +368,12 @@ public class Terminal implements ActionListener {
 	}
 
 	private void saveSettings(String fileName) {
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName + FILE_SUFFIX_PERIOD))) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(
+				new FileOutputStream(fileName + FILE_SUFFIX_PERIOD))) {
 			oos.writeObject(terminalSettings);
 		} catch (Exception e) {
-			String msg = String.format("Could not save to : %s%S. ", fileName, FILE_SUFFIX_PERIOD);
+			String msg = String.format("Could not save to : %s%S. ", fileName,
+					FILE_SUFFIX_PERIOD);
 			JOptionPane.showMessageDialog(null, msg);
 		}
 	}
@@ -425,16 +451,19 @@ public class Terminal implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setMultiSelectionEnabled(false);
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Saved State Files", FILE_SUFFIX);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(
+						"Saved State Files", FILE_SUFFIX);
 				chooser.setFileFilter(filter);
 				int returnValue = chooser.showOpenDialog(null);
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					String absolutePath = chooser.getSelectedFile().getAbsolutePath();
+					String absolutePath = chooser.getSelectedFile()
+							.getAbsolutePath();
 					// need to strip the file suffix off (will replace later)
 					int periodLocation = absolutePath.indexOf(".");
 					if (periodLocation != -1) {// this selection has a suffix
-						absolutePath = absolutePath.substring(0, periodLocation); // removed
-																					// suffix
+						absolutePath = absolutePath
+								.substring(0, periodLocation); // removed
+																// suffix
 					}// inner if
 					loadSettings(absolutePath);
 				} else {
@@ -456,20 +485,24 @@ public class Terminal implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setMultiSelectionEnabled(false);
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Saved State Files", FILE_SUFFIX);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(
+						"Saved State Files", FILE_SUFFIX);
 				chooser.setFileFilter(filter);
 				int returnValue = chooser.showSaveDialog(null);
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					String absolutePath = chooser.getSelectedFile().getAbsolutePath();
+					String absolutePath = chooser.getSelectedFile()
+							.getAbsolutePath();
 					// need to strip the file suffix off (will replace later)
 					int periodLocation = absolutePath.indexOf(".");
 					if (periodLocation != -1) {// this selection has a suffix
-						absolutePath = absolutePath.substring(0, periodLocation); // removed
-																					// suffix
+						absolutePath = absolutePath
+								.substring(0, periodLocation); // removed
+																// suffix
 					}// inner if
 					saveSettings(absolutePath);
 				} else {
-					JOptionPane.showMessageDialog(null, "You cancelled the Save as...");
+					JOptionPane.showMessageDialog(null,
+							"You cancelled the Save as...");
 				}// if - returnValue
 			}
 		});
@@ -517,10 +550,12 @@ public class Terminal implements ActionListener {
 		JMenu mnuOptions = new JMenu("Options");
 		menuBar.add(mnuOptions);
 
-		JMenuItem mnuOptionBackgroundColor = new JMenuItem("Background Color ...");
+		JMenuItem mnuOptionBackgroundColor = new JMenuItem(
+				"Background Color ...");
 		mnuOptionBackgroundColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Color newColor = JColorChooser.showDialog(null,"cc",screen.getBackground());
+				Color newColor = JColorChooser.showDialog(null, "cc",
+						screen.getBackground());
 				// JColorChooser cc = new JColorChooser();
 				// Color newColor = cc.showDialog(null,
 				// "Choose the screen background color",
@@ -538,7 +573,8 @@ public class Terminal implements ActionListener {
 		JMenuItem mnuOptionsFontColor = new JMenuItem("Font Color ...");
 		mnuOptionsFontColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Color newColor = JColorChooser.showDialog(null, "Choose the font color", screen.getForeground());
+				Color newColor = JColorChooser.showDialog(null,
+						"Choose the font color", screen.getForeground());
 				// JColorChooser cc = new JColorChooser();
 				// Color newColor = cc.showDialog(null, "Choose the font color",
 				// screen.getForeground());
@@ -558,7 +594,8 @@ public class Terminal implements ActionListener {
 		JMenu mnuUtility = new JMenu("Utilities");
 		menuBar.add(mnuUtility);
 
-		JCheckBoxMenuItem mnuUtilFullDuplex = new JCheckBoxMenuItem("FullDuplex");
+		JCheckBoxMenuItem mnuUtilFullDuplex = new JCheckBoxMenuItem(
+				"FullDuplex");
 		mnuUtilFullDuplex.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JCheckBoxMenuItem thisItem = (JCheckBoxMenuItem) ae.getSource();
@@ -577,7 +614,7 @@ public class Terminal implements ActionListener {
 
 		JSeparator separator_4 = new JSeparator();
 		mnuUtility.add(separator_4);
-		
+
 		JMenuItem mnuUtilFlushBuffers = new JMenuItem("Flush Buffers");
 		mnuUtilFlushBuffers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -585,15 +622,19 @@ public class Terminal implements ActionListener {
 				int outCount = keyBoardBuffer.size();
 				inputBuffer.clear();
 				keyBoardBuffer.clear();
-				String msg = String.format("Input Buffer: %d bytes, keyBoardBuffer: %d bytes", inCount,outCount);
-				JOptionPane.showMessageDialog(null,msg,"Flush Buffers", JOptionPane.INFORMATION_MESSAGE);
+				String msg = String.format(
+						"Input Buffer: %d bytes, keyBoardBuffer: %d bytes",
+						inCount, outCount);
+				JOptionPane.showMessageDialog(null, msg, "Flush Buffers",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		mnuUtility.add(mnuUtilFlushBuffers);
 		frame.getContentPane().setLayout(null);
 
 		JPanel panelConnection = new JPanel();
-		panelConnection.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		panelConnection.setBorder(new BevelBorder(BevelBorder.RAISED, null,
+				null, null, null));
 		panelConnection.setBounds(4, 0, 805, 31);
 		frame.getContentPane().add(panelConnection);
 		panelConnection.setLayout(null);
@@ -664,7 +705,8 @@ public class Terminal implements ActionListener {
 		panelStatus.setBackground(SystemColor.control);
 		panelStatus.setBounds(2, 490, 805, 20);
 		panelStatus.setMaximumSize(new Dimension(800, 450));
-		panelStatus.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panelStatus.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null,
+				null, null));
 		panelStatus.setMinimumSize(new Dimension(10, 20));
 		frame.getContentPane().add(panelStatus);
 		panelStatus.setLayout(null);
@@ -683,14 +725,14 @@ public class Terminal implements ActionListener {
 	}
 
 	// Static values
-//	private static int LOCATION_X = 2000;
-//	private static int LOCATION_Y = 250;
+	// private static int LOCATION_X = 2000;
+	// private static int LOCATION_Y = 250;
 	private static String BTN_OPEN = "Open";
 	private static String BTN_CLOSE = "Close";
 	/*
 	 * Constants and Variable for the terminal proper
 	 */
-//	private final static String LF = "\n";
+	// private final static String LF = "\n";
 	private final static String DEFAULT_STATE_FILE = "defaultTerminalSettings";
 	private final static String FILE_SUFFIX = "ser";
 	private final static String FILE_SUFFIX_PERIOD = "." + FILE_SUFFIX;
@@ -712,20 +754,19 @@ public class Terminal implements ActionListener {
 	 */
 	private static int MAX_ROWS = 24;
 	private static int MAX_COLUMNS = 80;
-	private static int MAX_LINE_SIZE = MAX_COLUMNS + 1; // include /r
+	// private static int MAX_LINE_SIZE = MAX_COLUMNS + 1; // include /r
 	private static int MAX_CHARACTERS = MAX_ROWS * MAX_COLUMNS;
-	private static int MAX_CONTENTS = (MAX_LINE_SIZE * MAX_ROWS); // -1
+	// private static int MAX_CONTENTS = (MAX_LINE_SIZE * MAX_ROWS); // -1
 	private static int ROW_23_COLUMN_0 = (MAX_CHARACTERS - MAX_COLUMNS) - 1;
 	private static int DEFAULT_TAB_WIDTH = 10;
 
-	private static String CR = "\r";
+	// private static String CR = "\r";
 	private static String SPACE = " ";
 	private static Byte SPACE_BYTE = 0X20;
 	private static String allPrintableCharactersPattern = "^([a-zA-Z0-9!@#$%^&amp;*()-_=+;:'&quot;|~`&lt;&gt;?/{}]{1,1})$";
 	private Pattern patternForPrintableChars;
 	private Matcher matcher;
 
-//	private boolean supressCaretUpdate = false;
 	private boolean fullDuplex = false;
 
 	public int count = 0;

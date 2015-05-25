@@ -32,10 +32,11 @@ public class PortSetupDetails extends JDialog implements ActionListener {
 
 	private void doAppInit() {
 
-		String[] ports = SerialPortList.getPortNames();
-		for (String port : ports) {
-			cbPort.addItem(port);
-		}
+//		String[] ports = SerialPortList.getPortNames();
+//		for (String port : ports) {
+//			cbPort.addItem(port);
+//		}
+		cbPort.addItem("COM1");
 		// set settings
 		cbPort.setSelectedItem(ts.getPortName());
 		cbBaudRate.setSelectedItem("" + ts.getBaudRate());
@@ -59,8 +60,7 @@ public class PortSetupDetails extends JDialog implements ActionListener {
 	/**
 	 * Create the dialog.
 	 */
-	public PortSetupDetails(Terminal terminal, TerminalSettings ts) {
-		this.terminal = terminal;
+	public PortSetupDetails( TerminalSettings ts) {
 		this.ts = ts;
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
@@ -168,7 +168,6 @@ public class PortSetupDetails extends JDialog implements ActionListener {
 				ts.setStopBits(2);
 			}//switch stopBits
 			ts.setParity(cbParity.getSelectedIndex());
-			terminal.establishSettings(ts);
 			break;
 		}
 

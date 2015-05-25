@@ -246,14 +246,15 @@ public class Terminal implements ActionListener {
 	 * Terminal class independent of screen and I/O
 	 */
 
-	public void establishSettings(TerminalSettings ts) {
-		this.terminalSettings = ts;
-		showConnectionString();
-	}// establishSettings
+//	public void establishSettings(TerminalSettings ts) {
+//		this.terminalSettings = ts;
+//		showConnectionString();
+//	}// establishSettings
 
 	private void doBtnSettings() {
-		PortSetupDetails psd = new PortSetupDetails(this, terminalSettings);
+		PortSetupDetails psd = new PortSetupDetails( terminalSettings);
 		psd.setVisible(true);
+		showConnectionString();
 	}// doBtnSettings
 
 	private void doBtnOpenClose() {

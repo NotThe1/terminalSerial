@@ -204,7 +204,7 @@ public class Terminal implements ActionListener {
 	}// processKeyTyped
 
 	// //////////***********
-	class SerialPortReader implements SerialPortEventListener {
+	public class SerialPortReader implements SerialPortEventListener {
 
 		@Override
 		public void serialEvent(SerialPortEvent spe) {

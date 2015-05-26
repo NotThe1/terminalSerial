@@ -5,7 +5,7 @@ import java.io.Serializable;
 //import java.util.ArrayList;
 //import java.util.Arrays;
 
-class TerminalSettings implements Serializable {
+public class TerminalSettings implements Serializable {
 	/**
 	 * 
 	 */
@@ -19,7 +19,7 @@ class TerminalSettings implements Serializable {
 	private Color screenForeground;
 	private Color screenBackground;
 
-	TerminalSettings() {
+	public TerminalSettings() {
 
 	}// Constuctor
 
